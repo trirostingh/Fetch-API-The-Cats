@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Generator Kucing (Fetch API)</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffefd5; /* Warna peach pastel yang lembut */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .kartu {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 300px;
+        }
+        h2 {
+            color: #d35400;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        .area-gambar {
+            width: 100%;
+            height: 250px;
+            background-color: #f1f2f6;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        #gambarKucing {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+        }
+        button {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #d35400;
+        }
+        #statusLoading {
+            font-size: 14px;
+            color: #7f8fa6;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="kartu">
+        <h2>🐱 Gambar Kucing Acak</h2>
+        
+        <div id="statusLoading">Memanggil meng...</div>
+        
+        <div class="area-gambar">
+            <!-- Gambar default -->
+            <img id="gambarKucing" src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" alt="Kucing">
+        </div>
+        
+        <button onclick="ambilGambar()">Panggil Kucing Lain</button>
+    </div>
+
+    <script>
+        function ambilGambar() {
+            // URL dari The Cat API
+            const url = 'https://api.thecatapi.com/v1/images/search';
+
+            const elemenGambar = document.getElementById('gambarKucing');
+            const elemenLoading = document.getElementById('statusLoading');
+
+            // Tampilkan status loading
+            elemenLoading.style.display = "block";
+            elemenGambar.style.opacity = "0.3";
+
+            // Proses Fetch API
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Gagal memanggil kucing');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Perbedaan penting: The Cat API mengembalikan data dalam bentuk Array!
+                    // Strukturnya: [ { "id": "...", "url": "https://..." } ]
+                    // Jadi kita harus mengambil elemen pertama dari array tersebut yaitu data[0]
+                    
+                    const linkGambar = data[0].url;
+
+                    // Ganti gambar HTML
+                    elemenGambar.src = linkGambar;
+
+                    // Tunggu gambar selesai diunduh oleh browser
+                    elemenGambar.onload = function() {
+                        elemenLoading.style.display = "none";
+                        elemenGambar.style.opacity = "1";
+                    };
+                })
+                .catch(error => {
+                    console.error("Terjadi kesalahan:", error);
+                    elemenLoading.innerText = "Kucingnya sedang tidur (Gagal memuat)!";
+                    elemenLoading.style.color = "red";
+                });
+        }
+    </script>
+</body>
+</html>
