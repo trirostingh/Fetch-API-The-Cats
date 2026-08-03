@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Galeri 8 Kucing (Grid)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #0984e3;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #74b9ff; }
+        
+        .wadah-galeri {
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            max-width: 900px;
+            margin: 0 auto; 
+        }
+
+        .kartu-kucing {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .kartu-kucing:hover {
+            transform: scale(1.05); /* Efek membesar saat kursor diarahkan */
+        }
+
+        .kartu-kucing img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Galeri Kucing 🐾</h2>
+    <button onclick="muatGaleri()">Muat 8 Kucing Baru</button>
+
+    <div class="wadah-galeri" id="galeri"></div>
+
+    <script>
+        function muatGaleri() {
+            // Kita biarkan limitnya minta 10 dari server
+            const url = 'https://api.thecatapi.com/v1/images/search?limit=10';
+            
+            const galeri = document.getElementById('galeri');
+            galeri.innerHTML = "Memuat data 8 kucing...";
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    galeri.innerHTML = "";
+
+                    // SOLUSI: Kita potong datanya pakai JavaScript (hanya ambil urutan ke-0 sampai 8)
+                    const dataKucing = data.slice(0, 8);
+
+                    // Looping sekarang hanya berjalan 8 kali
+                    dataKucing.forEach(kucing => {
+                        let kartu = document.createElement('div');
+                        kartu.className = 'kartu-kucing';
+
+                        let gambar = document.createElement('img');
+                        gambar.src = kucing.url;
+
+                        kartu.appendChild(gambar);
+                        galeri.appendChild(kartu);
+                    });
+                })
+                .catch(error => {
+                    galeri.innerHTML = "Gagal memuat galeri.";
+                    console.error(error);
+                });
+        }
+
+        // Jalankan saat pertama kali dibuka
+        muatGaleri();
+    </script>
+</body>
+</html>
